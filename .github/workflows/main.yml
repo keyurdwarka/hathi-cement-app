@@ -1,0 +1,31 @@
+name: Build Hathi Cement APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Android project
+        run: |
+          unzip -o Hathi_Cement_Android_APK_Project.zip -d app_project
+
+      - name: Find Gradle project
+        run: |
+          find app_project -name gradlew -type f -exec chmod +x {} \;
+
+      - name: Build APK
+        run: |
+          cd "$(dirname "$(find app_project -name gradlew -type f | head -1)")"
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hathi-Cement-APK
+          path: app_project/**/build/outputs/apk/**/*.apk
